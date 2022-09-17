@@ -42,7 +42,7 @@ object WallService {
                 posts[index] = post.copy(likes = Post.Likes(post.likes.count + 1,
                     true,
                     post.likes.canLike,
-                    post.likes.canPublish), views = Post.Views(post.views.count + 1))
+                    post.likes.canPublish), views = post.views + 1)
                 return posts[index]
             }
         }
