@@ -1,4 +1,3 @@
-import DirectMessages.DirectMessages
 import Notes.NoteComments
 import Notes.Notes
 import Posts.IdNotFoundException
@@ -83,100 +82,6 @@ object WallService {
     fun printPosts() {
         for ((index, _) in posts.withIndex()) {
             println(posts[posts.size - 1 - index])
-        }
-    }
-}
-
-object MessageService {
-    private var chats: MutableList<DirectMessages> = mutableListOf()
-
-    fun getUnreadChatsCount(userId: Int): Int {
-        var count = 0
-
-        for (chat in chats) {
-            if (chat.toId == userId) {
-                if (!chat.readState) count++
-            }
-        }
-        return count
-    }
-
-    fun getChats(userId: Int): MutableList<DirectMessages> {
-//        val list = chats.filter { chat: DirectMessages -> chat.fromId == userId }
-        val list = emptyList<DirectMessages>().toMutableList()
-        for (chat in chats) {
-            if (chat.fromId == userId) {
-                list.add(chat)
-//                if (chat.text.isEmpty()) {
-//                    chat.text.add("Нет сообщений")
-//                    list.add(chat)
-//                } else {
-//                    list.add(chat)
-//                }
-            }
-        }
-        return list
-    }
-
-    fun getMessageList(userId: Int, chatId: Int, lastReadMessageId: Int, messageCount: Int) {
-//        TODO Находим пользовательский чат (userId & chatId)
-
-//        TODO Получаем список сообщений
-
-//        TODO Помечаем прочитанными для отправителя
-
-    }
-
-    fun newMessage(toId: Int, fromId: Int, chatId: Int, text: String) {
-//        TODO Находим нужный чат и добавляем в список сообщений новое
-        if (chats.isEmpty()) {
-            createChat(toId, fromId, chatId, text)
-        }
-
-        for (chat in chats) {
-            if (chat.toId == toId && chat.fromId == fromId && chat.chatId == chatId) chat.text.add(text)
-            else createChat(toId, fromId, chatId, text)
-        }
-    }
-
-    fun deleteMessage(chatId: Int) {
-//         TODO Находим нужный чат
-
-//         TODO Проверяем что сообщений больше 1, иначе удаляем весь чат
-    }
-
-    fun createChat(toId: Int, fromId: Int, chatId: Int, text: String) {
-//        TODO чат создаётся тогда, когда пользователю, с которым до этого не было чата, отправляется первое сообщение
-
-        if (chats.isEmpty()) chats.add(DirectMessages(chatId, toId = toId, fromId = fromId, text = mutableListOf(text)))
-        else {
-            for (chat in chats) {
-                if (chat.chatId != chatId) {
-                    val newChat = DirectMessages(chatId, toId = toId, fromId = fromId, text = mutableListOf(text))
-                    chats.add(newChat)
-                    break
-                }
-            }
-        }
-    }
-
-    fun deleteChat(id: Int) {
-//         TODO Находим нужный чат и удаляем
-        for ((index, chat) in chats.withIndex()) {
-            if (chat.chatId == id) {
-                chats.removeAt(index)
-                break
-            }
-        }
-    }
-
-    fun printChats() {
-        if (chats.isEmpty()) println("Нет чатов")
-        else {
-            for (chat in chats) {
-                chat.text.reverse()
-                println(chat)
-            }
         }
     }
 }
@@ -342,23 +247,4 @@ fun main() {
 
     println(service.editComment(2, 1, 1, "UPDATED!"))
     println(service.getComments(1, note1.ownerId))
-
-/*    val service = MessageService
-//    service.createChat(2, 3, 1, "")
-//    service.createChat(2, 4, 2, "")
-//    service.createChat(1, 3, 3, "")
-
-    service.newMessage(2, 3, 1, "Hello message 1")
-    service.newMessage(2, 4, 2, "Hello message 2")
-    service.newMessage(1, 3, 3, "Hello message 3")
-    service.printChats()
-    println()
-
-    val list = service.getChats(2)
-    println(list.toString())
-
-//    service.deleteChat(7)
-//    service.printChats()
-
- */
 }
