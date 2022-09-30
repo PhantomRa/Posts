@@ -1,3 +1,5 @@
+package Posts
+
 data class Photo(
     val id: Int = 0,
     val albumId: Int = 0,
