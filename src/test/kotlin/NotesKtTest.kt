@@ -62,7 +62,7 @@ class NotesKtTest {
     fun editCommentTest() {
         val note = nService.add(Notes())
         val comment = nService.createComment(NoteComments(noteId = note!!.id, ownerId = note.ownerId, message = ""))
-        val testComment = NoteComments(comment!!.commentId, comment.noteId, comment.ownerId, message = "UPDATED")
+        val testComment = NoteComments(comment!!.commentId, comment.noteId, comment.ownerId, date = comment.date, message = "UPDATED")
 
         nService.editComment(comment.commentId, comment.noteId, comment.ownerId, "UPDATED")
         val list = nService.getComments(comment.noteId, comment.ownerId)
