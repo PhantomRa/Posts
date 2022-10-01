@@ -1,5 +1,3 @@
-import Notes.NoteComments
-import Notes.Notes
 import Posts.IdNotFoundException
 import Posts.Post
 import Posts.PostNotFoundException
@@ -72,7 +70,7 @@ class MainKtTest {
         val comment = wService.createComment(post.id, Post.Comments(15))
 
         assertEquals(2, post.id)
-        assertEquals(Post.Comments(15), comment)
+        assertEquals(15, comment.id)
     }
 
     @Test(expected = PostNotFoundException::class)
@@ -82,8 +80,8 @@ class MainKtTest {
 
     @Test(expected = IdNotFoundException::class)
     fun reportTest() {
-
+        val post = wService.add(Post())
+        val comment = wService.createComment(post.id, Post.Comments())
+        wService.reportComment(post.ownerId, -1, 2)
     }
-
-
 }
