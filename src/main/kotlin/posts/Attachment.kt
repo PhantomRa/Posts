@@ -1,4 +1,4 @@
-package Posts
+package posts
 
 data class Photo(
     val id: Int = 0,

@@ -1,5 +1,5 @@
-import Notes.NoteComments
-import Notes.Notes
+import notes.NoteComments
+import notes.Notes
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -7,117 +7,120 @@ import org.junit.Before
 
 class NotesKtTest {
     private val nService = NoteService
+    private val cService = NoteCommentService
 
     @Before
     fun clearNotes() {
         nService.clear()
     }
 
+    @Before
+    fun clearComments() {
+        cService.clear()
+    }
+
     @Test
     fun addNoteTest() {
-        val note = nService.add(Notes())
-        assertEquals(7, note?.id)
+        val noteId = nService.add(Notes(1, 1))
+        assertEquals(1, noteId)
     }
 
     @Test
     fun createCommentTest() {
-        val note = nService.add(Notes())
-        val comment1 = nService.createComment(NoteComments(0, 1,1, message = "message"))
-        val comment2 = nService.createComment(NoteComments(0, 1,1, message = "message 2"))
-//        assertEquals(comment1?.noteId, comment2?.noteId)
-//        assertEquals(comment1?.ownerId, comment2?.ownerId)
-        val list = nService.getComments(1, 1)
+        val noteId = nService.add(Notes(1, 1))
+        val comment1 = cService.add(NoteComments(noteId, noteId, 1, message = "message"))
+        val comment2 = cService.add(NoteComments(noteId, noteId, 2, message = "message2"))
 
-        assertEquals(comment2, list?.find { it.commentId == 2 })
+        assertEquals(1, comment1)
+        assertEquals(2, comment2)
+        assertEquals(2, cService.read().size)
     }
 
     @Test
     fun deleteTest() {
-        val note1 = nService.add(Notes())
-        val note2 = nService.add(Notes())
-        note1?.let { nService.delete(it.id) }
-        assertEquals(1, nService.get(1..100, 1).size)
+        val noteId1 = nService.add(Notes(3, 3))
+        val noteId2 = nService.add(Notes(4, 4))
+        nService.delete(noteId1)
+        assertEquals(1, nService.read().size)
     }
 
     @Test
     fun deleteCommentTest() {
-        val note = nService.add(Notes())
-        nService.createComment(NoteComments(0, 1,1, message = "message"))
-        nService.createComment(NoteComments(0, 1,1, message = "message2"))
-        nService.deleteComment(1, note!!.ownerId)
-        assertEquals(1, nService.getComments(note.id, note.ownerId)?.size)
+        val noteId = nService.add(Notes(5, 5))
+        val comment1Id = cService.add(NoteComments(noteId, noteId, 3, message = "message"))
+        val comment2Id = cService.add(NoteComments(noteId, noteId, 4, message = "message2"))
+        cService.delete(comment1Id)
+        assertEquals(1, cService.read().size)
     }
 
     @Test
     fun editTest() {
-        val note = nService.add(Notes())
-        val editedNote = Notes(note!!.id, note.ownerId, title = "Update test", text = "UPDATED", date = note.date)
+        val note = Notes(1, 1)
+        val noteId = nService.add(note)
+        val editedNote = Notes(noteId, noteId, title = "Update test", text = "UPDATED")
         nService.edit(editedNote)
-        val note2 = Notes(note.id, note.ownerId, title = "Update test", text = "UPDATED", date = note.date)
 
-        assertEquals(note2, nService.getById(note.id, note.ownerId))
+        assertEquals("UPDATED", nService.getById(noteId).text)
     }
 
     @Test
     fun editCommentTest() {
-        val note = nService.add(Notes())
-        val comment = nService.createComment(NoteComments(noteId = note!!.id, ownerId = note.ownerId, message = ""))
-        val testComment = NoteComments(comment!!.commentId, comment.noteId, comment.ownerId, date = comment.date, message = "UPDATED")
+        val note = Notes(6, 6)
+        val noteId = nService.add(note)
+        val commentId = cService.add(NoteComments(noteId, noteId, 5, message = "message"))
+        val comment = NoteComments(noteId, noteId, commentId, commentDate = note.date, message = "UPDATED")
+        cService.edit(comment)
 
-        nService.editComment(comment.commentId, comment.noteId, comment.ownerId, "UPDATED")
-        val list = nService.getComments(comment.noteId, comment.ownerId)
-        val result = list?.find { it.message == "UPDATED" }
-        assertEquals(testComment, result)
+        assertEquals(comment, cService.read()[0])
     }
 
     @Test
     fun getNotesTest() {
-        val list: MutableList<Notes> = mutableListOf()
-        for (i in 0..10) {
-            nService.add(Notes())?.let { list.add(it) }
+        for (i in 7..10L) {
+            nService.add(Notes(i, i))
         }
-        assertEquals(11, list.size)
+        assertEquals(4, nService.read().size)
     }
 
     @Test
     fun getNoteByIdTest() {
-        nService.add(Notes())
-        val note = nService.add(Notes())
-        assertEquals(note, nService.getById(note!!.id, note!!.ownerId))
+        val note = Notes(11, 11)
+        val noteId = nService.add(note)
+        assertEquals(note, nService.getById(noteId))
     }
 
     @Test
     fun getCommentsTest() {
         val list: MutableList<NoteComments> = mutableListOf()
-        nService.add(Notes())
-        nService.createComment(NoteComments(noteId = 1, ownerId = 1, message = "comment1"))?.let { list.add(it) }
-        nService.createComment(NoteComments(noteId = 1, ownerId = 1, message = "comment2"))?.let { list.add(it) }
-        nService.createComment(NoteComments(noteId = 1, ownerId = 1, message = "comment3"))?.let { list.add(it) }
-        assertEquals(list, nService.getComments(1, 1))
+        val note = Notes(12, 12)
+        val noteId = nService.add(note)
+        for (i in 6..8L) {
+            val comment = NoteComments(noteId, noteId, i, commentDate = note.date, message = "message$i")
+            cService.add(comment)
+            list.add(comment)
+        }
+        assertEquals(list, cService.read())
     }
 
     @Test
     fun getFriendsNotesTest() {
         val list: MutableList<Notes> = mutableListOf()
-        nService.add(Notes(ownerId = 4))
-        for (i in 0..5) {
-            nService.add(Notes())?.let { list.add(it) }
+        for (i in 13..15L) {
+            val note = Notes(i, i)
+            nService.add(note)
+            list.add(note)
         }
-        list.forEach { assertEquals(1, it.ownerId) }
-        assertEquals(6, list.size)
+        assertEquals(3, list.size)
     }
 
-//    Не работает
+    @Test
+    fun restoreCommentTest() {
+        val note = Notes(1, 1)
+        val noteId = nService.add(note)
+        val commentId = cService.add(NoteComments(noteId, noteId, 1, message = "message"))
 
-//    @Test
-//    fun restoreCommentTest() {
-//        val note = nService.add(Notes())
-//        val comment1 = nService.createComment(NoteComments(noteId = note!!.id, ownerId = 1, message = "comment1"))
-//        val comment2 = nService.createComment(NoteComments(noteId = note.id, ownerId = 1, message = "comment2"))
-//        val comment3 = nService.createComment(NoteComments(noteId = note.id, ownerId = 1, message = "comment3"))
-//
-//        assertEquals(true, nService.getComments(note.id, note.ownerId)?.contains(comment2))
-//        nService.deleteComment(comment2!!.commentId, comment2.ownerId)
-//        assertEquals(false, nService.getComments(note.id, note.ownerId)?.contains(comment2))
-//    }
+        assertEquals(false, cService.getById(commentId).isDeleted)
+        cService.delete(commentId)
+        assertEquals(true, cService.getById(commentId).isDeleted)
+    }
 }

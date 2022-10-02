@@ -1,4 +1,4 @@
-package Posts
+package posts
 
 enum class PostSourceType {
     vk, widget, api, rss, sms

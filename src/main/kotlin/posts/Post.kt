@@ -1,4 +1,4 @@
-package Posts
+package posts
 
 import java.time.LocalDateTime
 

@@ -1,6 +1,6 @@
-import Posts.IdNotFoundException
-import Posts.Post
-import Posts.PostNotFoundException
+import posts.IdNotFoundException
+import posts.Post
+import posts.PostNotFoundException
 import org.junit.Test
 
 import org.junit.Assert.*
