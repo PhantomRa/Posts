@@ -1,3 +1,5 @@
+package posts
+
 import java.time.LocalDateTime
 
 data class Post(
@@ -10,7 +12,7 @@ data class Post(
     val replyOwnerId: Int = 0,
     val replyPostId: Int = 0,
     val friendsOnly: Boolean = false,
-    var comments: Comments? = null,
+    var comments: Comments? = Comments(),
     var copyright: Copyright = Copyright(),
     val likes: Likes = Likes(),
     var reposts: Reposts? = null,
@@ -20,7 +22,7 @@ data class Post(
     val attachments: Array<Attachment> = emptyArray(),
     val geo: Geo? = null,
     val signerId: Int = 0,
-//    val copyHistory: Array<Post>,
+//    val copyHistory: Array<Posts.Post>,
     val canPin: Boolean = false,
     val canDelete: Boolean = false,
     val canEdit: Boolean = false,
@@ -31,19 +33,33 @@ data class Post(
     val postponedId: Int? = null,
 ) {
     data class Comments(
-        val _count: Int = 0,
-        val canPost: Boolean = true,
-        val groupsCanPost: Boolean = true,
-        val canClose: Boolean = false,
-        val canOpen: Boolean = false,
+        val id: Int = 0,
+        val fromId: Int = 0,
+        val date: Int = 0,
+        val text: String = "",
+        val donut: Donut? = null,
+        val replyToUser: Int = 0,
+        val replyToComment: Int = 0,
+        val attachments: Array<Attachment> = emptyArray(),
+        val parentStack: Array<Int> = emptyArray(),
+        val thread: PostThread = PostThread(),
     ) {
-        var count = _count
-            set(value) {
-                if (value < 0) {
-                    return
+        data class PostThread(
+            val _count: Int = 0,
+//            val items: Array<> = emptyArray(),
+            val canPost: Boolean = true,
+            val showReplyButton: Boolean = true,
+            val groupsCanPost: Boolean = true,
+        ) {
+            var count = _count
+                set(value) {
+                    if (value < 0) {
+                        return
+                    }
+                    field = value
                 }
-                field = value
-            }
+        }
+
     }
 
     data class Copyright(
@@ -93,21 +109,21 @@ data class Post(
             }
     }
 
-//    data class Photo(
+//    data class Posts.Photo(
 //        val id: Int = 0,
 //        val albumId: Int = 0,
 //        val ownerId: Int = 0,
 //        val userId: Int = 0,
 //    )
 //
-//    data class Video(
+//    data class Posts.Video(
 //        val id: Int = 0,
 //        val albumId: Int = 0,
 //        val ownerId: Int = 0,
 //        val userId: Int = 0,
 //    )
 //
-//    data class Audio(
+//    data class Posts.Audio(
 //        val id: Int = 0,
 //        val ownerId: Int = 0,
 //        val artist: String = "artist",
@@ -116,7 +132,7 @@ data class Post(
 //        val albumId: Int = 0,
 //    )
 //
-//    data class Doc(
+//    data class Posts.Doc(
 //        val id: Int = 0,
 //        val ownerId: Int = 0,
 //        val title: String = "doc",
@@ -124,20 +140,20 @@ data class Post(
 //        val ext: String = ".docx",
 //    )
 //
-//    data class Graffiti(
+//    data class Posts.Graffiti(
 //        val id: Int = 0,
 //        val ownerId: Int = 0,
 //        val photo130: String = "",
 //        val photo604: String = "",
 //    )
 
-//    abstract class Attachment(val type: String)
+//    abstract class Posts.Attachment(val type: String)
 
-//    data class PhotoAttachment(val photo: Photo): Attachment("photo")
-//    data class VideoAttachment(val video: Video): Attachment("video")
-//    data class AudioAttachment(val audio: Audio): Attachment("audio")
-//    data class DocAttachment(val doc: Doc): Attachment("doc")
-//    data class GraffitiAttachment(val graffiti: Graffiti): Attachment("graffiti")
+//    data class Posts.PhotoAttachment(val photo: Posts.Photo): Posts.Attachment("photo")
+//    data class Posts.VideoAttachment(val video: Posts.Video): Posts.Attachment("video")
+//    data class Posts.AudioAttachment(val audio: Posts.Audio): Posts.Attachment("audio")
+//    data class Posts.DocAttachment(val doc: Posts.Doc): Posts.Attachment("doc")
+//    data class Posts.GraffitiAttachment(val graffiti: Posts.Graffiti): Posts.Attachment("graffiti")
 
     data class Geo(
         val type: String = "",

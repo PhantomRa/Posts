@@ -13,4 +13,5 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation 'junit:junit:4.13.1'
+    implementation "org.jetbrains.kotlin:kotlin-android-extensions:1.7.10"
 }

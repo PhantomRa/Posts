@@ -1,3 +1,6 @@
+import posts.IdNotFoundException
+import posts.Post
+import posts.PostNotFoundException
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -6,38 +9,40 @@ import kotlin.random.Random
 
 class MainKtTest {
 
+    //    Posts
+    val wService = WallService
     @Before
     fun clear() {
-        WallService.clear()
+        wService.clear()
     }
 
     @Test
     fun postIdChange() {
-        val wsPost1 = WallService.add(Post(111, 10, text = "content1", likes = Post.Likes(4)))
+        val wsPost1 = wService.add(Post(111, 10, text = "content1", likes = Post.Likes(4)))
 
         assertEquals(1, wsPost1.id)
     }
 
     @Test
     fun negativeLikesToZero() {
-        val wsPost1 = WallService.add(Post(0, 10, text = "content1", likes = Post.Likes(-4)))
+        val wsPost1 = wService.add(Post(0, 10, text = "content1", likes = Post.Likes(-4)))
 
         assertEquals(0, wsPost1.likes.count)
     }
 
     @Test
     fun postUpdate() {
-        val wsPost1 = WallService.add(Post(0, 10, text = "content1", likes = Post.Likes(10)))
+        val wsPost1 = wService.add(Post(0, 10, text = "content1", likes = Post.Likes(10)))
         val newPost = wsPost1.copy(text = "content2", likes = Post.Likes(14))
 
-        assertEquals(true, WallService.update(newPost))
+        assertEquals(true, wService.update(newPost))
     }
 
     @Test
     fun postNotUpdate() {
         val newPost = Post(49, 7, text = "content2", likes = Post.Likes(14))
 
-        assertEquals(false, WallService.update(newPost))
+        assertEquals(false, wService.update(newPost))
     }
 
     @Test
@@ -46,32 +51,37 @@ class MainKtTest {
             val post = Post(fromId = Random.nextInt(100),
                 text = "content",
                 likes = Post.Likes(Random.nextInt(100)))
-            WallService.add(post)
+            wService.add(post)
         }
-        WallService.printPosts()
+        wService.printPosts()
     }
 
     @Test
     fun isLiked() {
-        val newPost = WallService.add(Post(fromId = 17, text = "content", likes = Post.Likes(27)))
-        val result = WallService.likeById(newPost.id)
+        val newPost = wService.add(Post(fromId = 17, text = "content", likes = Post.Likes(27)))
+        val result = wService.likeById(newPost.id)
 
         assertEquals(28, result?.likes?.count)
     }
 
     @Test
     fun addComment() {
-        val service = WallService
-        val post = service.add(Post())
-        val comment = service.createComment(post.id, Post.Comments(15))
+        val post = wService.add(Post())
+        val comment = wService.createComment(post.id, Post.Comments(15))
 
         assertEquals(2, post.id)
-        assertEquals(Post.Comments(15), comment)
+        assertEquals(15, comment.id)
     }
 
     @Test(expected = PostNotFoundException::class)
     fun commentThrowException() {
-        val service = WallService
-        val commentException = service.createComment(5, Post.Comments())
+        val commentException = wService.createComment(5, Post.Comments())
+    }
+
+    @Test(expected = IdNotFoundException::class)
+    fun reportTest() {
+        val post = wService.add(Post())
+        val comment = wService.createComment(post.id, Post.Comments())
+        wService.reportComment(post.ownerId, -1, 2)
     }
 }
