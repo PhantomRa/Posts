@@ -36,7 +36,7 @@ data class Graffiti(
     val photo604: String = "",
 )
 
-abstract class Attachment(val type: String)
+sealed class Attachment(val type: String)
 
 data class PhotoAttachment(val photo: Photo): Attachment("photo")
 data class VideoAttachment(val video: Video): Attachment("video")
