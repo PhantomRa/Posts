@@ -1,3 +1,5 @@
+import directMessages.DirectMessages
+import directMessages.Message
 import notes.IdAlreadyExistsException
 import notes.InvalidIdException
 import notes.NoteComments
@@ -106,9 +108,9 @@ interface CrudService<E> {
 
 private var notes: MutableList<Notes> = mutableListOf()
 private var comments: MutableList<NoteComments> = mutableListOf()
+private var chats: MutableList<DirectMessages> = mutableListOf()
 
 object NoteService : CrudService<Notes> {
-
     override fun clear() {
         notes = mutableListOf()
     }
@@ -147,7 +149,6 @@ object NoteService : CrudService<Notes> {
 }
 
 object NoteCommentService : CrudService<NoteComments> {
-
     override fun clear() {
         comments = mutableListOf()
     }
@@ -160,18 +161,6 @@ object NoteCommentService : CrudService<NoteComments> {
         } else {
             throw IdAlreadyExistsException("Такой ID уже существует")
         }
-
-//        for ((index, note) in notes.withIndex()) {
-//            if (note.noteId == entity.noteId) {
-//                comments.forEach { comment ->
-//                    if (comment.id != entity.id && entity is Notes) {
-//                        notes[index].comments.add(entity)
-//                        return comment.id
-//                    }
-//                }
-//            }
-//        }
-//        throw IdAlreadyExistsException("Такой ID уже существует")
     }
 
     override fun delete(id: Long) {
@@ -201,171 +190,97 @@ object NoteCommentService : CrudService<NoteComments> {
     }
 }
 
-/*
-//object NoteService {
-//    private var notes: MutableList<Notes> = mutableListOf()
-//    private var deletedComments: MutableList<NoteComments> = mutableListOf()
-//    private var nextNoteId = 1
-//    private var nextCommentId = 1
-//
-//    fun clear() {
-//        notes = mutableListOf()
-//    }
-//
-//    fun add(_note: Notes): Notes? {
-//        if (!notes.contains(_note)) {
-//            val newNote = _note.copy(id = nextNoteId)
-//            notes.add(newNote)
-//            nextNoteId++
-//            return notes.last()
-//        }
-//        return null
-//    }
-//
-//    fun createComment(_comment: NoteComments): NoteComments? {
-//        notes.forEach {
-//            if (it.id == _comment.noteId && it.ownerId == _comment.ownerId) {
-//                val comment = NoteComments(
-//                    nextCommentId,
-//                    it.id,
-//                    it.ownerId,
-//                    _comment.replyTo,
-//                    _comment.date,
-//                    _comment.message,
-//                )
-//                nextCommentId++
-//                it.comments?.add(comment)
-//                return it.comments?.last()
-//            }
-//        }
-//        return null
-//    }
-//
-//    fun delete(noteId: Int): Boolean {
-//        for ((index, note) in notes.withIndex()) {
-//            if (note.id == noteId) {
-//                notes.removeAt(index)
-//                return true
-//            }
-//        }
-//        return false
-//    }
-//
-//    fun deleteComment(commentId: Int, ownerId: Int): Boolean {
-//        notes.forEach { note ->
-//            if (note.ownerId == ownerId) {
-//                note.comments?.forEach { it ->
-//                    if (it.commentId == commentId) {
-//                        deletedComments.add(note.comments!![commentId])
-//                        note.comments!!.removeAt(commentId - 1)
-//                        return true
-//                    }
-//                }
-//            }
-//        }
-//        return false
-//    }
-//
-//    fun edit(_note: Notes): Boolean {
-//        notes.forEach {
-//            if (it.id == _note.id && it.ownerId == _note.ownerId) {
-//                val editedNote = it.copy(
-//                    id = it.id,
-//                    ownerId = it.ownerId,
-//                    title = _note.title,
-//                    text = _note.text,
-//                    date = _note.date,
-//                    comments = _note.comments,
-//                    readComments = _note.readComments,
-//                    viewUrl = _note.viewUrl,
-//                    privacyView = _note.privacyView,
-//                    canComment = _note.canComment,
-//                    textWiki = _note.textWiki
-//                )
-//                notes[notes.indexOf(it)] = editedNote
-//                return true
-//            }
-//        }
-//        return false
-//    }
-//
-//    fun editComment(commentId: Int, noteId: Int, ownerId: Int, _message: String): Boolean {
-//        notes.forEach { note ->
-//            if (note.id == noteId && note.ownerId == ownerId) {
-//                note.comments?.forEach {
-//                    if (it.commentId == commentId) {
-//                        note.comments!![note.comments!!.indexOf(it)] = it.copy(date = note.date, message = _message)
-//                        return true
-//                    }
-//                }
-//            }
-//        }
-//        return false
-//    }
-//
-//    fun get(noteIds: IntRange, userId: Int, sort: Int = 0): MutableList<Notes> {
-//        val list: MutableList<Notes> = mutableListOf()
-//        noteIds.forEach {
-//            for (note in notes) if (note.id.compareTo(it) == 0 && note.ownerId == userId) list.add(note)
-//        }
-//        return if (sort == 1) list
-//        else {
-//            list.reverse()
-//            list
-//        }
-//    }
-//
-//    fun getById(
-//        noteId: Int,
-//        ownerId: Int,
-//        needWiki: Boolean = false,
-//    ): Notes? = notes.find { it.id == noteId && it.ownerId == ownerId }
-//
-//    fun getComments(noteId: Int, ownerId: Int, sort: Int = 1): MutableList<NoteComments>? {
-//        var list: MutableList<NoteComments>? = mutableListOf()
-//        notes.forEach {
-//            if (it.id == noteId && it.ownerId == ownerId) {
-//                list = it.comments
-//            }
-//        }
-//        if (sort == 1) return list
-//        else if (sort == 0) {
-//            list!!.reverse()
-//            return list
-//        }
-//        return null
-//    }
-//
-//    fun getFriendsNotes(ownerId: Int): MutableList<Notes> = notes.filter { it.ownerId == ownerId }.toMutableList()
-//
-//    fun restoreComment(commentId: Int, noteId: Int, ownerId: Int): Boolean {
-//        deletedComments.forEach { comment ->
-//            if (comment.commentId == commentId && comment.noteId == noteId && comment.ownerId == ownerId) {
-//                notes.forEach { note ->
-//                    if (note.id == noteId && note.ownerId == ownerId) {
-//                        note.comments?.add(commentId - 1, comment)
-//                        return true
-//                    }
-//                }
-//            }
-//        }
-//        return false
-//    }
-//}
- */
-
-fun main() {
-    val nService = NoteService
-    val comService = NoteCommentService
-
-    for (i in 1..3L) {
-        val id = nService.add(Notes(i, i))
-        comService.add(NoteComments(id, id, i, message = "test"))
+object ChatService : CrudService<DirectMessages> {
+    override fun clear() {
+        chats = mutableListOf()
     }
 
-//    val id = nService.add(Notes(1, 1))
-//    comService.add(NoteComments(id, id, 10, message = "test"))
+    override fun add(entity: DirectMessages): Long {
+        if (entity.chatId < 1) throw InvalidIdException("Неверный ID")
+        if (chats.find { it.chatId == entity.chatId } == null) {
+            chats.add(entity)
+            return entity.chatId
+        } else {
+            throw IdAlreadyExistsException("Такой ID уже существует")
+        }
+    }
 
-    println(nService.read())
-    println(comService.read())
+    override fun delete(id: Long) {
+        for ((index, message) in chats.withIndex()) {
+            if (message.chatId == id) chats.removeAt(index)
+        }
+    }
+
+    //    Not used
+    override fun edit(entity: DirectMessages) {}
+
+    override fun read(): List<DirectMessages> = chats.toList()
+
+    override fun getById(id: Long): DirectMessages =
+        chats.find { it.chatId == id } ?: throw IdNotFoundException("Чат с таким ID не найден")
+
+    //    Not used
+    override fun restore(id: Long) {}
+
+    fun addMessage(userId: Long, toId: Long, chatId: Long, message: Message) {
+        val chat = chats.find {
+            it.fromId == userId && it.chatId == chatId
+        }
+        if (chat != null) chat.message.add(message)
+        else {
+            val entity = DirectMessages(userId, toId, chatId)
+            entity.message.add(message)
+            add(entity)
+        }
+    }
+
+    fun deleteMessage(userId: Long, toId: Long, chatId: Long, messageId: Long) {
+        val chat = chats.find {
+            it.fromId == userId && it.toId == toId && it.chatId == chatId
+        }
+
+        if (chat?.message!!.count() > 1)
+            chat.message.removeIf { it.messageId == messageId }
+        else {
+            chats.remove(chat)
+        }
+    }
+
+    fun editMessage(entity: Message) {
+        val chat = chats.find { it.fromId == entity.fromId && it.toId == entity.toId && it.chatId == entity.chatId }
+        chat?.message?.forEach { message ->
+            if (message.messageId == entity.messageId) {
+                message.text = entity.text
+                message.messageDate = entity.messageDate
+            }
+        }
+    }
+
+    fun getMessages(userId: Long, chatId: Long): List<Message> {
+        val list = chats.find {
+            it.fromId == userId && it.chatId == chatId
+        }?.message!!.toList()
+        list.onEach { it.readState = true }
+        return list
+    }
+
+    fun getUnreadChatsCount(userId: Long): Int {
+        var count = 0
+        chats.forEach { chat ->
+            if (chat.fromId == userId && chat.message.count { !it.readState } > 0) count++
+        }
+        return count
+    }
+}
+
+fun main() {
+    val service = ChatService
+
+    for (i in 1..3L) {
+        service.addMessage(99, 90, i, Message(99, 90, i, i, "message $i"))
+    }
+
+    println(service.read())
+    println(service.getMessages(99, 1))
+    println(service.getUnreadChatsCount(99))
 }

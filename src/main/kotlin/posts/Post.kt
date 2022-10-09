@@ -109,52 +109,6 @@ data class Post(
             }
     }
 
-//    data class Posts.Photo(
-//        val id: Int = 0,
-//        val albumId: Int = 0,
-//        val ownerId: Int = 0,
-//        val userId: Int = 0,
-//    )
-//
-//    data class Posts.Video(
-//        val id: Int = 0,
-//        val albumId: Int = 0,
-//        val ownerId: Int = 0,
-//        val userId: Int = 0,
-//    )
-//
-//    data class Posts.Audio(
-//        val id: Int = 0,
-//        val ownerId: Int = 0,
-//        val artist: String = "artist",
-//        val title: String = "title",
-//        val duration: Int = 0,
-//        val albumId: Int = 0,
-//    )
-//
-//    data class Posts.Doc(
-//        val id: Int = 0,
-//        val ownerId: Int = 0,
-//        val title: String = "doc",
-//        val size: Int = 0,
-//        val ext: String = ".docx",
-//    )
-//
-//    data class Posts.Graffiti(
-//        val id: Int = 0,
-//        val ownerId: Int = 0,
-//        val photo130: String = "",
-//        val photo604: String = "",
-//    )
-
-//    abstract class Posts.Attachment(val type: String)
-
-//    data class Posts.PhotoAttachment(val photo: Posts.Photo): Posts.Attachment("photo")
-//    data class Posts.VideoAttachment(val video: Posts.Video): Posts.Attachment("video")
-//    data class Posts.AudioAttachment(val audio: Posts.Audio): Posts.Attachment("audio")
-//    data class Posts.DocAttachment(val doc: Posts.Doc): Posts.Attachment("doc")
-//    data class Posts.GraffitiAttachment(val graffiti: Posts.Graffiti): Posts.Attachment("graffiti")
-
     data class Geo(
         val type: String = "",
         val coordinates: String = "",
