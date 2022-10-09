@@ -214,7 +214,9 @@ object ChatService : CrudService<DirectMessages> {
     //    Not used
     override fun edit(entity: DirectMessages) {}
 
-    override fun read(): List<DirectMessages> = chats.toList()
+    override fun read(): List<DirectMessages> =
+        chats.asSequence()
+            .toList()
 
     override fun getById(id: Long): DirectMessages =
         chats.find { it.chatId == id } ?: throw IdNotFoundException("Чат с таким ID не найден")
@@ -226,6 +228,7 @@ object ChatService : CrudService<DirectMessages> {
         val chat = chats.find {
             it.fromId == userId && it.chatId == chatId
         }
+
         if (chat != null) chat.message.add(message)
         else {
             val entity = DirectMessages(userId, toId, chatId)
@@ -246,23 +249,20 @@ object ChatService : CrudService<DirectMessages> {
         }
     }
 
-    fun editMessage(entity: Message) {
-        val chat = chats.find { it.fromId == entity.fromId && it.toId == entity.toId && it.chatId == entity.chatId }
-        chat?.message?.forEach { message ->
-            if (message.messageId == entity.messageId) {
-                message.text = entity.text
-                message.messageDate = entity.messageDate
+    fun editMessage(entity: Message) =
+        chats.asSequence()
+            .find { it.fromId == entity.fromId && it.toId == entity.toId && it.chatId == entity.chatId }
+            ?.message?.forEach { message ->
+                if (message.messageId == entity.messageId) {
+                    message.text = entity.text
+                    message.messageDate = entity.messageDate
+                }
             }
-        }
-    }
 
-    fun getMessages(userId: Long, chatId: Long): List<Message> {
-        val list = chats.find {
-            it.fromId == userId && it.chatId == chatId
-        }?.message!!.toList()
-        list.onEach { it.readState = true }
-        return list
-    }
+    fun getMessages(userId: Long, chatId: Long): List<Message> =
+        chats.asSequence()
+            .find { it.fromId == userId && it.chatId == chatId }?.message!!
+            .onEach { it.readState = true }
 
     fun getUnreadChatsCount(userId: Long): Int {
         var count = 0
