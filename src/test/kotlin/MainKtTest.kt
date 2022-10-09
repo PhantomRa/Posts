@@ -58,4 +58,20 @@ class MainKtTest {
 
         assertEquals(28, result?.likes?.count)
     }
+
+    @Test
+    fun addComment() {
+        val service = WallService
+        val post = service.add(Post())
+        val comment = service.createComment(post.id, Post.Comments(15))
+
+        assertEquals(2, post.id)
+        assertEquals(Post.Comments(15), comment)
+    }
+
+    @Test(expected = PostNotFoundException::class)
+    fun commentThrowException() {
+        val service = WallService
+        val commentException = service.createComment(5, Post.Comments())
+    }
 }
