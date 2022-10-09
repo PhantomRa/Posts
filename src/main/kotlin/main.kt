@@ -57,19 +57,37 @@ object WallService {
 }
 
 fun main() {
-    val wsPost1 =
-        WallService.add(Post(fromId = 48, text = "content", likes = Post.Likes(-50, canPublish = false)))
-    val wsPost2 =
-        WallService.add(Post(fromId = 19, text = "content2", likes = Post.Likes(12)))
+    for (i in 1 until 10) {
+        WallService.add(Post(attachments = arrayOf(
+            PhotoAttachment(Photo(i)),
+            VideoAttachment(Video(i)),
+            AudioAttachment(Audio(i)),
+            DocAttachment(Doc(i)),
+            GraffitiAttachment(Graffiti(i)),
+        )))
+    }
+    WallService.printPosts()
 
-    WallService.update(wsPost1.copy(text = "testUpdate", isFavorite = true))
-    WallService.update(wsPost2.copy(text = "testUpdate2", canPin = true))
+//    val wsPost1 = WallService.add(Post(fromId = 48, text = "content", likes = Post.Likes(-50, canPublish = false),
+//            attachments = arrayOf(
+//                PhotoAttachment(Photo(1)),
+//                VideoAttachment(Video(2))
+//            )))
+//    val wsPost2 = WallService.add(Post(fromId = 19, text = "content2", likes = Post.Likes(12),
+//            attachments = arrayOf(
+//                DocAttachment(Doc(4)),
+//                GraffitiAttachment(Graffiti(5)),
+//                AudioAttachment(Audio(3))
+//            )))
 
-    println(WallService.likeById(wsPost1.id))
-    println(WallService.likeById(wsPost1.id))
-    println(WallService.likeById(wsPost1.id))
-    println(WallService.likeById(wsPost2.id))
-    println(WallService.likeById(wsPost2.id))
+//    WallService.update(wsPost1.copy(text = "testUpdate", isFavorite = true))
+//    WallService.update(wsPost2.copy(text = "testUpdate2", canPin = true))
 
-    println(WallService.likeById(10))
+//    println(WallService.likeById(wsPost1.id))
+//    println(WallService.likeById(wsPost1.id))
+//    println(WallService.likeById(wsPost1.id))
+//    println(WallService.likeById(wsPost2.id))
+//    println(WallService.likeById(wsPost2.id))
+//
+//    println(WallService.likeById(10))
 }
