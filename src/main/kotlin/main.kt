@@ -1,5 +1,6 @@
 object WallService {
     private var posts = emptyArray<Post>()
+    private var comments = emptyArray<Post.Comments>()
     private var nextId = 1
 
     fun clear() {
@@ -49,6 +50,16 @@ object WallService {
         return null
     }
 
+    fun createComment(postId: Int, comment: Post.Comments): Post.Comments {
+        for (post in posts) {
+            if (post.id == postId) {
+                comments += comment
+                return comments.last()
+            }
+        }
+        throw PostNotFoundException("No post with id = $postId")
+    }
+
     fun printPosts() {
         for ((index, _) in posts.withIndex()) {
             println(posts[posts.size - 1 - index])
@@ -57,22 +68,11 @@ object WallService {
 }
 
 fun main() {
-    val post = Post(attachments = arrayOf(
-        PhotoAttachment(Photo(1)),
-        VideoAttachment(Video(2)),
-        AudioAttachment(Audio(3)),
-        DocAttachment(Doc(4)),
-        GraffitiAttachment(Graffiti(5)),
-    ))
+    val service = WallService
+    val post = service.add(Post())
+    val comment = service.createComment(post.id, Post.Comments(15, groupsCanPost = false))
+    println(comment)
 
-    for (attachment in post.attachments) {
-        println(
-            when (attachment) {
-                is PhotoAttachment -> "Photo: ${attachment.photo}"
-                is VideoAttachment -> "Video: ${attachment.video}"
-                is AudioAttachment -> "Audio: ${attachment.audio}"
-                is DocAttachment -> return  //"Doc: ${attachment.doc}"
-                is GraffitiAttachment -> return  //"Graffiti: ${attachment.graffiti}"
-            })
-    }
+//    val commentException = service.createComment(5, Post.Comments())
+//    println(commentException)
 }
